@@ -16,6 +16,13 @@ const PHONE = process.env.NEXT_PUBLIC_PHONE ?? "01000000000";
 const KAKAO_URL = process.env.NEXT_PUBLIC_KAKAO_CHANNEL_URL ?? "https://pf.kakao.com/_YOUR_CHANNEL";
 const TELEGRAM_URL = process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/YOUR_TELEGRAM";
 
+declare global {
+  interface Window {
+    dataLayer?: Array<Record<string, unknown>>;
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 function formatPhoneDisplay(raw: string): string {
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 11) return `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`;
@@ -45,11 +52,11 @@ const JsonLd: React.FC = () => {
 
 const BLUE_GRADIENT = "from-blue-600 to-blue-800";
 
-function track(event: string, params: Record<string, any> = {}) {
+function track(event: string, params: Record<string, unknown> = {}) {
   if (typeof window !== "undefined") {
-    (window as any).dataLayer = (window as any).dataLayer || [];
-    (window as any).dataLayer.push({ event, ...params });
-    const gtag = (window as any).gtag;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event, ...params });
+    const gtag = window.gtag;
     if (typeof gtag === "function") gtag("event", event, params);
   }
 }
@@ -68,7 +75,7 @@ const Header = () => (
         data-cta="header-phone"
         className="group inline-flex items-center gap-2 text-blue-700 font-medium"
       >
-        <span className="hidden sm:inline">010-0000-0000</span>
+        <span className="hidden sm:inline">{formatPhoneDisplay(PHONE)}</span>
         <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white group-hover:scale-105 transition">
           <Phone className="h-5 w-5" />
         </span>
@@ -126,7 +133,7 @@ const StatCard = ({
   title,
   desc,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   desc: string;
 }) => (

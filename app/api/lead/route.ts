@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => ({} as any));
+    const body = await req.json().catch(() => ({} as Record<string, unknown>));
     const name: string = (body?.name ?? "").toString();
     const phone: string = (body?.phone ?? "").toString();
 
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     // await fetch(process.env.LEAD_WEBHOOK_URL!, { method: 'POST', body: JSON.stringify({ name, phone }) });
 
     return NextResponse.json({ ok: true });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }
